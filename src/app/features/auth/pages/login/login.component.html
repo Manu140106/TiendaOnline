@@ -1,0 +1,31 @@
+<app-auth-template
+  title="Iniciar Sesión"
+  subtitle="Accede a tu cuenta de Tienda Online">
+
+  <div *ngIf="errorMessage" 
+       class="bg-red-50 border-l-4 border-red-500 text-red-800 px-4 py-3 rounded-lg mb-6 shadow-sm">
+    <p class="font-medium">{{ errorMessage }}</p>
+  </div>
+
+  <div *ngIf="isLoading" class="text-center py-8">
+    <mat-spinner diameter="50" class="mx-auto"></mat-spinner>
+    <p class="text-gray-600 mt-4 font-medium">Iniciando sesión...</p>
+  </div>
+
+  <div *ngIf="!isLoading">
+    <app-login-form
+      [form]="loginForm"
+      submitLabel="Ingresar"
+      (submitForm)="onSubmit()"
+      (forgotPassword)="onForgotPassword()">
+    </app-login-form>
+
+    <div class="mt-6 text-center text-sm text-gray-600">
+      <p>¿No tienes cuenta? 
+        <a routerLink="/auth/register" class="text-blue-600 hover:text-blue-800 font-semibold">
+          Regístrate aquí
+        </a>
+      </p>
+    </div>
+  </div>
+</app-auth-template>

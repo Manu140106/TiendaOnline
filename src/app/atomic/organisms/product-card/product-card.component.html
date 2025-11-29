@@ -1,0 +1,60 @@
+<div class="bg-white rounded-xl shadow-md hover:shadow-xl transition-shadow duration-300 overflow-hidden">
+  <div class="relative h-48 bg-gray-200 overflow-hidden">
+    <img 
+      [src]="product.imageUrl || 'https://via.placeholder.com/400'" 
+      [alt]="product.name"
+      class="w-full h-full object-cover hover:scale-110 transition-transform duration-300">
+    <div class="absolute top-2 right-2">
+      <span class="bg-blue-500 text-white text-xs px-3 py-1 rounded-full font-semibold">
+        {{ product.category }}
+      </span>
+    </div>
+    <div class="absolute top-2 left-2" *ngIf="product.stock < 10">
+      <span class="bg-red-500 text-white text-xs px-3 py-1 rounded-full font-semibold">
+        ¡Últimas unidades!
+      </span>
+    </div>
+  </div>
+
+  <div class="p-5">
+    <h3 class="text-lg font-bold text-gray-900 mb-2 line-clamp-1">
+      {{ product.name }}
+    </h3>
+    <p class="text-sm text-gray-600 mb-3 line-clamp-2 h-10">
+      {{ product.description }}
+    </p>
+
+    <div class="flex items-center justify-between mb-4">
+      <div>
+        <p class="text-2xl font-bold text-green-600">
+          ${{ product.price | number:'1.2-2' }}
+        </p>
+        <p class="text-xs text-gray-500">
+          Stock: {{ product.stock }} unidades
+        </p>
+      </div>
+      <div class="text-right">
+        <p class="text-xs text-gray-500">Vendedor:</p>
+        <p class="text-sm font-semibold text-gray-700">{{ product.sellerName || 'Sin asignar' }}</p>
+      </div>
+    </div>
+
+    <div class="flex gap-2">
+      <button 
+        (click)="onView()"
+        class="flex-1 bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition text-sm font-semibold">
+        Ver Detalles
+      </button>
+      <button 
+        (click)="onEdit()"
+        class="bg-yellow-500 text-white py-2 px-4 rounded-lg hover:bg-yellow-600 transition">
+        <span class="text-sm">✏️</span>
+      </button>
+      <button 
+        (click)="onDelete()"
+        class="bg-red-500 text-white py-2 px-4 rounded-lg hover:bg-red-600 transition">
+        <span class="text-sm">🗑️</span>
+      </button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,10 @@
+<button 
+  mat-raised-button
+  [color]="color"
+  [type]="type"
+  [disabled]="disabled"
+  (click)="onClick()"
+  class="w-full flex items-center justify-center gap-2 rounded-lg font-semibold">
+  <mat-icon *ngIf="icon">{{ icon }}</mat-icon>
+  {{ label }}
+</button>

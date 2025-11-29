@@ -1,0 +1,33 @@
+<form
+  [formGroup]="form"
+  (ngSubmit)="onSubmit()"
+  class="flex flex-col gap-4 w-full max-w-sm">
+  
+  <app-form-field
+    label="Correo electrónico"
+    placeholder="usuario&#64;correo.com"
+    type="email"
+    [control]="getControl('username')">
+  </app-form-field>
+  
+  <app-form-field
+    label="Contraseña"
+    placeholder="Tu contraseña"
+    type="password"
+    [control]="getControl('password')">
+  </app-form-field>
+  
+  <app-button 
+    [label]="submitLabel" 
+    color="primary" 
+    type="submit"
+    class="mt-2">
+  </app-button>
+  
+  <button
+    type="button"
+    (click)="onForgotPasswordClick()"
+    class="text-sm text-blue-600 hover:text-blue-800 hover:underline text-center cursor-pointer bg-transparent border-0 p-2">
+    ¿Olvidaste tu contraseña?
+  </button>
+</form>
