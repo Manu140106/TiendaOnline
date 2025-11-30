@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ProductService } from '../../../../core/services/product.service';
+import { CartService } from '../../../../core/services/cart.service';
 import { Product } from '../../../../core/models/product';
 
 @Component({
@@ -17,7 +18,8 @@ export class ProductDetailComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private productService: ProductService
+    private productService: ProductService,
+    private cartService: CartService
   ) {}
 
   ngOnInit(): void {
@@ -57,8 +59,23 @@ export class ProductDetailComponent implements OnInit {
 
   addToCart(): void {
     if (this.product) {
-      console.log('🛒 Agregar al carrito:', this.product.name, 'x', this.quantity);
-      alert(`✅ Agregado al carrito:\n\n${this.product.name}\nCantidad: ${this.quantity}\n\n(Carrito en desarrollo)`);
+      this.cartService.addItem(this.product, this.quantity);
+      console.log('🛒 Agregado al carrito:', this.product.name, 'x', this.quantity);
+      
+      const goToCart = confirm(
+        `✅ ${this.product.name} agregado al carrito!\n\nCantidad: ${this.quantity}\n\n¿Ir al carrito ahora?`
+      );
+      
+      if (goToCart) {
+        this.router.navigate(['/cart']);
+      }
+    }
+  }
+
+  buyNow(): void {
+    if (this.product) {
+      this.cartService.addItem(this.product, this.quantity);
+      this.router.navigate(['/cart']);
     }
   }
 

@@ -10,6 +10,7 @@ import { Product } from '../../../core/models/product';
 })
 export class ProductFormComponent implements OnInit {
   @Input() product?: Product;
+  @Input() isLoading = false;
   @Output() submitForm = new EventEmitter<any>();
   @Output() cancel = new EventEmitter<void>();
 

@@ -1,9 +1,8 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, of, throwError } from 'rxjs';
 import { map, tap, delay, catchError } from 'rxjs/operators';
 import { Router } from '@angular/router';
-
 import { User } from '../models/user';
 import { LoginRequest, LoginResponse, AuthData } from '../models/auth';
 
@@ -81,7 +80,7 @@ export class AuthService {
           expiresIn: 3600 
         };
         
-        console.log('✅ Login MOCK exitoso con cualquier credencial:', response);
+        console.log('✅ Login MOCK exitoso:', response);
         return response;
       }),
       catchError(error => {
@@ -91,42 +90,54 @@ export class AuthService {
     );
   }
 
-  loginReal(credentials: LoginRequest): Observable<LoginResponse> {
-    console.log('🔄 Intentando login REAL con:', credentials.username);
-    
-    return this.http.post<LoginResponse>(`${this.apiUrl}/login`, credentials).pipe(
-      tap(response => console.log('✅ Login REAL exitoso:', response)),
-      catchError(error => {
-        console.error('❌ Error en login REAL:', error);
-        return throwError(() => error);
-      })
-    );
-  }
-
   login(credentials: LoginRequest): Observable<User> {
-    // 🔴 CAMBIAR AQUÍ: usa loginReal() cuando tengas backend
     return this.loginMock(credentials).pipe(
       tap(response => {
         this.setAuthData(response);
-        
         this.currentUserSubject.next(response.user);
         this.isAuthenticatedSubject.next(true);
-        
         console.log('✅ Usuario autenticado:', response.user);
       }),
       map(response => response.user)
     );
   }
 
+  forgotPassword(email: string): Observable<{ message: string }> {
+    console.log('📧 Solicitud de recuperación MOCK para:', email);
+
+    return of(null).pipe(
+      delay(1500),
+      map(() => {
+        const resetToken = 'reset-token-' + Date.now();
+        console.log('✅ Token de recuperación generado:', resetToken);
+        
+        return {
+          message: `Se ha enviado un correo a ${email} con instrucciones para recuperar tu contraseña.`
+        };
+      })
+    );
+  }
+
+  resetPassword(token: string, newPassword: string): Observable<{ message: string }> {
+    console.log('🔑 Reset password MOCK con token:', token);
+
+    return of(null).pipe(
+      delay(1000),
+      map(() => {
+        console.log('✅ Contraseña cambiada exitosamente');
+        return {
+          message: 'Tu contraseña ha sido actualizada exitosamente. Ya puedes iniciar sesión.'
+        };
+      })
+    );
+  }
+
   logout(): void {
     console.log('👋 Cerrando sesión...');
-    
     this.clearAuthData();
     this.currentUserSubject.next(null);
     this.isAuthenticatedSubject.next(false);
-    
     this.router.navigate(['/auth/login']);
-    
     console.log('✅ Sesión cerrada');
   }
 
@@ -168,5 +179,17 @@ export class AuthService {
     }
     
     return isValid;
+  }
+
+  // ========== MÉTODOS REALES (para cuando tengas backend) ==========
+  forgotPasswordReal(email: string): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(`${this.apiUrl}/forgot-password`, { email });
+  }
+
+  resetPasswordReal(token: string, newPassword: string): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(`${this.apiUrl}/reset-password`, { 
+      token, 
+      newPassword 
+    });
   }
 }

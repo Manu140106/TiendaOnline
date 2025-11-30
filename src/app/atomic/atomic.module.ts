@@ -54,7 +54,8 @@ import { CartIconComponent } from './atoms/cart-icon/cart-icon.component';
     ProductCardComponent,
     MatProgressSpinnerModule,
     ProductFormComponent,
-    ProductFiltersComponent 
+    ProductFiltersComponent,
+    CartIconComponent
   ]
 })
 export class AtomicModule { }
