@@ -72,20 +72,51 @@ export class CartPageComponent implements OnInit {
     this.router.navigate(['/products']);
   }
 
+  trackByProductId(index: number, item: CartItem): string {
+    return item.product.id;
+  }
+
+
   checkout(): void {
+    console.log('💳 checkout() método ejecutado');
+
     if (this.cartItems.length === 0) {
-      alert('El carrito está vacío');
+      alert('⚠️ El carrito está vacío');
       return;
     }
 
     this.isProcessing = true;
     console.log('💳 Procesando checkout...');
+    console.log('📦 Productos:', this.cartItems.length);
+    console.log('💰 Total a pagar:', this.total);
 
     setTimeout(() => {
       this.isProcessing = false;
-      alert(`✅ ¡Compra exitosa!\n\nTotal: $${this.total.toFixed(2)}\n\n${this.cartItems.length} producto(s) comprados\n\n(Funcionalidad de pago en desarrollo)`);
+
+      const message = `
+✅ ¡Compra exitosa!
+
+📦 Productos comprados: ${this.cartItems.length}
+💰 Total pagado: $${this.total.toFixed(2)}
+
+Detalles:
+- Subtotal: $${this.subtotal.toFixed(2)}
+- Envío: ${this.shipping === 0 ? 'GRATIS' : '$' + this.shipping.toFixed(2)}
+- Impuestos: $${this.tax.toFixed(2)}
+
+🎉 Tu pedido ha sido procesado
+📧 Recibirás un correo de confirmación
+
+(Funcionalidad de pago en desarrollo)
+      `.trim();
+
+      alert(message);
+
       this.cartService.clearCart();
+
       this.router.navigate(['/products']);
+      
+      console.log('✅ Checkout completado, carrito limpiado, redirigido a /products');
     }, 2000);
   }
 }

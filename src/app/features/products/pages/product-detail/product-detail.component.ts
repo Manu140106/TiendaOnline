@@ -73,10 +73,21 @@ export class ProductDetailComponent implements OnInit {
   }
 
   buyNow(): void {
-    if (this.product) {
-      this.cartService.addItem(this.product, this.quantity);
-      this.router.navigate(['/cart']);
+    if (!this.product) {
+      alert('⚠️ Producto no disponible');
+      return;
     }
+
+    if (this.product.stock === 0) {
+      alert('⚠️ Producto sin stock');
+      return;
+    }
+
+    console.log('💳 Compra directa:', this.product.name, 'x', this.quantity);
+
+    this.cartService.addItem(this.product, this.quantity);
+
+    this.router.navigate(['/cart']);
   }
 
   goBack(): void {

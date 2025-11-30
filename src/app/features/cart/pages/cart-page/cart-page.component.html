@@ -4,9 +4,11 @@
       <div class="flex items-center justify-between">
         <h1 class="text-2xl font-bold text-gray-900">🛒 Mi Carrito</h1>
         <button 
+          type="button"
           (click)="continueShopping()"
+          aria-label="Continuar comprando productos"
           class="text-blue-600 hover:text-blue-800 font-semibold flex items-center gap-2">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
           </svg>
           Continuar comprando
@@ -18,18 +20,20 @@
   <main class="container mx-auto px-6 py-8">
 
     <div *ngIf="cartItems.length === 0" class="text-center py-20">
-      <div class="text-8xl mb-6">🛒</div>
+      <div class="text-8xl mb-6" aria-hidden="true">🛒</div>
       <h2 class="text-3xl font-bold text-gray-900 mb-3">Tu carrito está vacío</h2>
       <p class="text-gray-600 mb-8">¡Agrega productos y comienza a comprar!</p>
       <button 
+        type="button"
         (click)="continueShopping()"
+        aria-label="Ir a explorar productos"
         class="px-8 py-4 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition font-semibold text-lg">
         Explorar Productos
       </button>
     </div>
 
     <div *ngIf="cartItems.length > 0" class="grid lg:grid-cols-3 gap-8">
-      
+
       <div class="lg:col-span-2 space-y-4">
         <div class="bg-white rounded-xl shadow-md p-6">
           <div class="flex justify-between items-center mb-6">
@@ -37,14 +41,16 @@
               Productos ({{ cartItems.length }})
             </h2>
             <button 
+              type="button"
               (click)="clearCart()"
+              aria-label="Vaciar todo el carrito"
               class="text-red-600 hover:text-red-800 text-sm font-semibold">
               🗑️ Vaciar carrito
             </button>
           </div>
 
           <div 
-            *ngFor="let item of cartItems" 
+            *ngFor="let item of cartItems; trackBy: trackByProductId" 
             class="flex gap-4 py-6 border-b last:border-0">
 
             <div class="w-24 h-24 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
@@ -73,9 +79,12 @@
 
             <div class="flex flex-col items-end justify-between">
               <button 
+                type="button"
                 (click)="removeItem(item.product.id)"
+                [attr.aria-label]="'Eliminar ' + item.product.name + ' del carrito'"
+                [title]="'Eliminar ' + item.product.name"
                 class="text-gray-400 hover:text-red-600 transition">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                 </svg>
               </button>
@@ -89,18 +98,26 @@
                 </p>
               </div>
 
-              <div class="flex items-center gap-2 bg-gray-100 rounded-lg p-1">
+              <div class="flex items-center gap-2 bg-gray-100 rounded-lg p-1" 
+                   role="group" 
+                   [attr.aria-label]="'Controlar cantidad de ' + item.product.name">
                 <button 
+                  type="button"
                   (click)="updateQuantity(item.product.id, item.quantity - 1)"
                   [disabled]="item.quantity <= 1"
-                  class="w-8 h-8 bg-white rounded hover:bg-gray-200 transition disabled:opacity-50">
+                  [attr.aria-label]="'Disminuir cantidad de ' + item.product.name"
+                  title="Disminuir cantidad"
+                  class="w-8 h-8 bg-white rounded hover:bg-gray-200 transition disabled:opacity-50 disabled:cursor-not-allowed">
                   -
                 </button>
-                <span class="w-12 text-center font-semibold">{{ item.quantity }}</span>
+                <span class="w-12 text-center font-semibold" aria-live="polite">{{ item.quantity }}</span>
                 <button 
+                  type="button"
                   (click)="updateQuantity(item.product.id, item.quantity + 1)"
                   [disabled]="item.quantity >= item.product.stock"
-                  class="w-8 h-8 bg-white rounded hover:bg-gray-200 transition disabled:opacity-50">
+                  [attr.aria-label]="'Aumentar cantidad de ' + item.product.name"
+                  title="Aumentar cantidad"
+                  class="w-8 h-8 bg-white rounded hover:bg-gray-200 transition disabled:opacity-50 disabled:cursor-not-allowed">
                   +
                 </button>
               </div>
@@ -110,7 +127,7 @@
 
         <div class="bg-blue-50 border border-blue-200 rounded-xl p-6">
           <div class="flex items-start gap-3">
-            <div class="text-3xl">🚚</div>
+            <div class="text-3xl" aria-hidden="true">🚚</div>
             <div>
               <h3 class="font-semibold text-gray-900 mb-1">Envío Gratis</h3>
               <p class="text-sm text-gray-600">
@@ -149,27 +166,33 @@
           </div>
 
           <button 
+            type="button"
             (click)="checkout()"
-            [disabled]="isProcessing"
+            [disabled]="isProcessing || cartItems.length === 0"
+            [attr.aria-label]="isProcessing ? 'Procesando pago' : 'Proceder al pago del carrito'"
+            [attr.aria-busy]="isProcessing"
             class="w-full bg-green-500 text-white py-4 rounded-lg hover:bg-green-600 transition font-semibold text-lg disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center gap-2">
-            <mat-spinner *ngIf="isProcessing" diameter="20" class="inline-block"></mat-spinner>
-            <span *ngIf="!isProcessing">💳 Proceder al Pago</span>
+            <mat-spinner *ngIf="isProcessing" diameter="20" class="inline-block" color="accent"></mat-spinner>
+            <svg *ngIf="!isProcessing" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
+            </svg>
+            <span *ngIf="!isProcessing">Proceder al Pago</span>
             <span *ngIf="isProcessing">Procesando...</span>
           </button>
 
           <div class="mt-6 pt-6 border-t">
             <p class="text-sm text-gray-600 mb-3 text-center">Métodos de pago aceptados:</p>
-            <div class="flex justify-center gap-3">
-              <div class="w-12 h-8 bg-gray-100 rounded flex items-center justify-center text-xs font-bold">
+            <div class="flex justify-center gap-3" role="list" aria-label="Métodos de pago aceptados">
+              <div class="w-12 h-8 bg-gray-100 rounded flex items-center justify-center text-xs font-bold" role="listitem" aria-label="Visa">
                 VISA
               </div>
-              <div class="w-12 h-8 bg-gray-100 rounded flex items-center justify-center text-xs font-bold">
+              <div class="w-12 h-8 bg-gray-100 rounded flex items-center justify-center text-xs font-bold" role="listitem" aria-label="Mastercard">
                 MC
               </div>
-              <div class="w-12 h-8 bg-gray-100 rounded flex items-center justify-center text-xs font-bold">
+              <div class="w-12 h-8 bg-gray-100 rounded flex items-center justify-center text-xs font-bold" role="listitem" aria-label="American Express">
                 AMEX
               </div>
-              <div class="w-12 h-8 bg-gray-100 rounded flex items-center justify-center text-xs font-bold">
+              <div class="w-12 h-8 bg-gray-100 rounded flex items-center justify-center text-xs font-bold" role="listitem" aria-label="PayPal">
                 PP
               </div>
             </div>
@@ -177,19 +200,19 @@
 
           <div class="mt-6 space-y-3">
             <div class="flex items-center gap-2 text-sm text-gray-600">
-              <svg class="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+              <svg class="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
                 <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
               </svg>
               <span>Compra 100% segura</span>
             </div>
             <div class="flex items-center gap-2 text-sm text-gray-600">
-              <svg class="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+              <svg class="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
                 <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
               </svg>
               <span>Devolución en 30 días</span>
             </div>
             <div class="flex items-center gap-2 text-sm text-gray-600">
-              <svg class="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+              <svg class="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
                 <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
               </svg>
               <span>Garantía de satisfacción</span>

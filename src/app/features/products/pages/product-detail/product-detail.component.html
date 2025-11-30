@@ -102,7 +102,11 @@
               class="w-full bg-blue-500 text-white py-4 rounded-lg hover:bg-blue-600 transition text-lg font-semibold disabled:bg-gray-300 disabled:cursor-not-allowed">
               🛒 Agregar al Carrito
             </button>
-            <button class="w-full bg-green-500 text-white py-4 rounded-lg hover:bg-green-600 transition text-lg font-semibold">
+
+            <button 
+              (click)="buyNow()"
+              [disabled]="product.stock === 0"
+              class="w-full bg-green-500 text-white py-4 rounded-lg hover:bg-green-600 transition text-lg font-semibold disabled:bg-gray-300 disabled:cursor-not-allowed">
               💳 Comprar Ahora
             </button>
           </div>
