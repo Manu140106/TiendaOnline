@@ -46,11 +46,13 @@
         Ver Detalles
       </button>
       <button 
+        *ngIf="showActions"
         (click)="onEdit()"
         class="bg-yellow-500 text-white py-2 px-4 rounded-lg hover:bg-yellow-600 transition">
         <span class="text-sm">✏️</span>
       </button>
       <button 
+        *ngIf="showActions"
         (click)="onDelete()"
         class="bg-red-500 text-white py-2 px-4 rounded-lg hover:bg-red-600 transition">
         <span class="text-sm">🗑️</span>

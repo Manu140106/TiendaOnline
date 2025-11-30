@@ -1,0 +1,25 @@
+<div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-6">
+  <div class="container mx-auto max-w-4xl">
+
+    <button 
+      (click)="onCancel()"
+      class="mb-6 flex items-center gap-2 text-gray-700 hover:text-blue-600 transition font-semibold">
+      <span class="text-2xl">←</span>
+      <span>Volver al catálogo</span>
+    </button>
+
+    <div *ngIf="isLoading && isEditMode" class="text-center py-12">
+      <mat-spinner diameter="50" class="mx-auto mb-4"></mat-spinner>
+      <p class="text-gray-600">Cargando producto...</p>
+    </div>
+
+    <app-product-form
+      *ngIf="!isLoading || !isEditMode"
+      [product]="product"
+      [isLoading]="isLoading"
+      (submitForm)="onSubmit($event)"
+      (cancel)="onCancel()">
+    </app-product-form>
+
+  </div>
+</div>

@@ -9,6 +9,7 @@ import { Product } from '../../../core/models/product';
 })
 export class ProductCardComponent {
   @Input() product!: Product;
+  @Input() showActions = true;
   @Output() view = new EventEmitter<Product>();
   @Output() edit = new EventEmitter<Product>();
   @Output() delete = new EventEmitter<Product>();

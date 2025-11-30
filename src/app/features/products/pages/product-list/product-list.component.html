@@ -9,6 +9,7 @@
       </div>
       <div class="flex items-center gap-3">
         <button 
+          *appHasRole="['admin', 'seller']"
           (click)="onCreateProduct()"
           class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition font-semibold">
           + Nuevo Producto
@@ -74,23 +75,42 @@
       <div class="flex justify-between items-center mb-6">
         <h2 class="text-2xl font-bold text-gray-900">Catálogo de Productos</h2>
         <div class="flex gap-2">
-          <button class="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition text-sm">
-            🔍 Filtrar
-          </button>
-          <button class="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition text-sm">
-            📊 Ordenar
+          <button 
+            (click)="toggleFilters()"
+            class="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition text-sm">
+            {{ showFilters ? '✕ Cerrar' : '🔍 Filtrar' }}
           </button>
         </div>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        <app-product-card 
-          *ngFor="let product of products"
-          [product]="product"
-          (view)="onViewProduct($event)"
-          (edit)="onEditProduct($event)"
-          (delete)="onDeleteProduct($event)">
-        </app-product-card>
+      <div class="grid lg:grid-cols-4 gap-6">
+        <div *ngIf="showFilters" class="lg:col-span-1">
+          <app-product-filters (filtersChange)="onFiltersChange($event)"></app-product-filters>
+        </div>
+
+        <div [ngClass]="showFilters ? 'lg:col-span-3' : 'lg:col-span-4'">
+          <p class="text-sm text-gray-600 mb-4">
+            Mostrando {{ filteredProducts.length }} de {{ products.length }} productos
+          </p>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+               [ngClass]="{'lg:grid-cols-4': !showFilters}">
+            <app-product-card 
+              *ngFor="let product of filteredProducts"
+              [product]="product"
+              [showActions]="currentUser?.role === 'admin' || currentUser?.role === 'seller'"
+              (view)="onViewProduct($event)"
+              (edit)="onEditProduct($event)"
+              (delete)="onDeleteProduct($event)">
+            </app-product-card>
+          </div>
+
+          <div *ngIf="filteredProducts.length === 0" class="text-center py-12">
+            <div class="text-6xl mb-4">🔍</div>
+            <h3 class="text-2xl font-bold text-gray-900 mb-2">No se encontraron productos</h3>
+            <p class="text-gray-600 mb-6">Intenta ajustar los filtros o realizar otra búsqueda</p>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -106,4 +126,16 @@
     </div>
 
   </main>
+
+  <div *ngIf="showCreateForm || showEditForm" 
+       class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+       (click)="closeForm()">
+    <div (click)="$event.stopPropagation()" class="w-full max-w-2xl">
+      <app-product-form
+        [product]="selectedProduct || undefined"
+        (submitForm)="onFormSubmit($event)"
+        (cancel)="closeForm()">
+      </app-product-form>
+    </div>
+  </div>
 </div>

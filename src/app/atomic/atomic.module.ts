@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule } from '@angular/forms';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
@@ -14,6 +14,10 @@ import { AuthTemplateComponent } from './templates/auth-template/auth-template.c
 import { DesignShowcaseComponent } from './pages/design-showcase/design-showcase.component';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ProductCardComponent } from './organisms/product-card/product-card.component';
+import { ProductFormComponent } from './organisms/product-form/product-form.component';
+import { ProductFiltersComponent } from './molecules/product-filters/product-filters.component';
+import { CartIconComponent } from './atoms/cart-icon/cart-icon.component';
+
 
 @NgModule({
   declarations: [
@@ -24,7 +28,10 @@ import { ProductCardComponent } from './organisms/product-card/product-card.comp
     LoginFormComponent,
     AuthTemplateComponent,
     DesignShowcaseComponent,
-    ProductCardComponent
+    ProductCardComponent,
+    ProductFormComponent,
+    ProductFiltersComponent,
+    CartIconComponent,
   ],
   imports: [
     CommonModule,
@@ -33,7 +40,8 @@ import { ProductCardComponent } from './organisms/product-card/product-card.comp
     MatInputModule,
     MatIconModule,
     MatFormFieldModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule, 
+    FormsModule
   ],
   exports: [
     ButtonComponent,
@@ -44,7 +52,9 @@ import { ProductCardComponent } from './organisms/product-card/product-card.comp
     AuthTemplateComponent,
     DesignShowcaseComponent,
     ProductCardComponent,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    ProductFormComponent,
+    ProductFiltersComponent 
   ]
 })
 export class AtomicModule { }
