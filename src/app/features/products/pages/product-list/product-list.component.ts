@@ -107,7 +107,13 @@ export class ProductListComponent implements OnInit {
 
   onEditProduct(product: Product): void {
     console.log('✏️ Editar producto:', product.name);
-    alert(`Editar: ${product.name}\n\n(Funcionalidad en desarrollo)`);
+
+    if (this.currentUser?.role === 'admin' || this.currentUser?.role === 'seller') {
+      console.log('→ Redirigiendo a editar producto:', product.id);
+      this.router.navigate(['/products/edit', product.id]);
+    } else {
+      alert('⛔ No tienes permisos para editar productos');
+    }
   }
 
   onDeleteProduct(product: Product): void {
@@ -127,8 +133,8 @@ export class ProductListComponent implements OnInit {
   }
 
   onCreateProduct(): void {
-    this.showCreateForm = true;
-    alert('Crear nuevo producto\n\n(Formulario en desarrollo)');
+    console.log('➕ Crear nuevo producto');
+    this.router.navigate(['/products/create']);
   }
 
   logout(): void {
@@ -143,7 +149,6 @@ export class ProductListComponent implements OnInit {
 
   onFormSubmit(product: Product): void {
     if (this.selectedProduct) {
-
       this.productService.updateProduct(this.selectedProduct.id, product).subscribe({
         next: () => {
           console.log('✅ Producto actualizado:', product.name);
