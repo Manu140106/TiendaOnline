@@ -180,4 +180,15 @@ export class ProductService {
   deleteProductReal(id: string): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
+
+  getProductsBySeller(sellerName: string): Observable<Product[]> {
+    console.log('📦 ProductService: Obteniendo productos del vendedor:', sellerName);
+    const sellerProducts = this.mockProducts.filter(p => p.sellerName === sellerName);
+    return of(sellerProducts).pipe(
+      delay(500),
+      tap(products => {
+        console.log('✅ Productos del vendedor obtenidos:', products.length);
+      })
+    );
+  }
 }

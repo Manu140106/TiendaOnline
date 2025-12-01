@@ -48,24 +48,37 @@ export class AuthService {
     return authData?.token || null;
   }
 
+  private determineRole(email: string): 'admin' | 'seller' | 'buyer' {
+    const lowerEmail = email.toLowerCase();
+    
+    if (lowerEmail === 'admin@tienda.com') {
+      return 'admin';
+    } else if (lowerEmail === 'seller@tienda.com' || lowerEmail.includes('vendedor')) {
+      return 'seller';
+    } else {
+      return 'buyer';
+    }
+  }
+
   loginMock(credentials: LoginRequest): Observable<LoginResponse> {
     console.log('🔄 Intentando login MOCK con:', credentials);
 
     return of(null).pipe(
       delay(1000),
       map(() => {
-        let role: 'admin' | 'seller' | 'buyer' = 'buyer';
-        let name = 'Usuario';
+        const role = this.determineRole(credentials.username);
         
-        if (credentials.username.includes('admin')) {
-          role = 'admin';
-          name = 'Administrador';
-        } else if (credentials.username.includes('seller') || credentials.username.includes('vendedor')) {
-          role = 'seller';
-          name = 'Vendedor';
+        let name = 'Usuario';
+        let avatar = `https://i.pravatar.cc/150?img=${Math.floor(Math.random() * 70)}`;
+
+        if (role === 'admin') {
+          name = 'Administrador Principal';
+          avatar = 'https://i.pravatar.cc/150?img=12'; // Avatar específico
+        } else if (role === 'seller') {
+          name = 'Vendedor TechStore';
+          avatar = 'https://i.pravatar.cc/150?img=33'; // Avatar específico
         } else {
-          role = 'buyer';
-          name = 'Comprador';
+          name = credentials.username.split('@')[0];
         }
 
         const response: LoginResponse = {
@@ -75,12 +88,13 @@ export class AuthService {
             email: credentials.username,
             name: name,
             role: role,
-            avatar: `https://i.pravatar.cc/150?img=${Math.floor(Math.random() * 70)}`
+            avatar: avatar
           },
           expiresIn: 3600 
         };
         
         console.log('✅ Login MOCK exitoso:', response);
+        console.log('👤 Rol asignado:', role);
         return response;
       }),
       catchError(error => {
@@ -97,9 +111,37 @@ export class AuthService {
         this.currentUserSubject.next(response.user);
         this.isAuthenticatedSubject.next(true);
         console.log('✅ Usuario autenticado:', response.user);
+        console.log('🎭 Rol:', response.user.role);
       }),
       map(response => response.user)
     );
+  }
+
+  redirectToDashboard(): void {
+    const user = this.currentUserValue;
+    
+    if (!user) {
+      this.router.navigate(['/auth/login']);
+      return;
+    }
+
+    console.log('🔀 Redirigiendo según rol:', user.role);
+
+    switch (user.role) {
+      case 'admin':
+        console.log('→ Redirigiendo a /admin/dashboard');
+        this.router.navigate(['/admin/dashboard']);
+        break;
+      case 'seller':
+        console.log('→ Redirigiendo a /seller/dashboard');
+        this.router.navigate(['/seller/dashboard']);
+        break;
+      case 'buyer':
+      default:
+        console.log('→ Redirigiendo a /products');
+        this.router.navigate(['/products']);
+        break;
+    }
   }
 
   forgotPassword(email: string): Observable<{ message: string }> {
@@ -179,17 +221,5 @@ export class AuthService {
     }
     
     return isValid;
-  }
-
-  // ========== MÉTODOS REALES (para cuando tengas backend) ==========
-  forgotPasswordReal(email: string): Observable<{ message: string }> {
-    return this.http.post<{ message: string }>(`${this.apiUrl}/forgot-password`, { email });
-  }
-
-  resetPasswordReal(token: string, newPassword: string): Observable<{ message: string }> {
-    return this.http.post<{ message: string }>(`${this.apiUrl}/reset-password`, { 
-      token, 
-      newPassword 
-    });
   }
 }

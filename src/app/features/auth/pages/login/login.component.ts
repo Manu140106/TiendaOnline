@@ -48,13 +48,7 @@ export class LoginComponent implements OnInit {
         console.log('✅ Login exitoso, usuario:', user);
         this.isLoading = false;
         
-        if (user.role === 'admin') {
-          this.router.navigate(['/admin/dashboard']);
-        } else if (user.role === 'seller') {
-          this.router.navigate(['/seller/products']);
-        } else {
-          this.router.navigate(['/products']);
-        }
+        this.authService.redirectToDashboard();
       },
       error: (error) => {
         console.error('❌ Error en login:', error);
@@ -66,9 +60,29 @@ export class LoginComponent implements OnInit {
 
   onForgotPassword(): void {
     console.log('🔗 Link "Olvidaste tu contraseña" presionado');
-    alert('🔐 Recuperación de Contraseña\n\nEsta funcionalidad estará disponible próximamente.\n\nPor ahora puedes:\n- Usar cualquier email y contraseña para entrar\n- O crear una nueva cuenta');
+    this.router.navigate(['/auth/forgot-password']);
+  }
+
+  quickLogin(role: 'admin' | 'seller' | 'buyer'): void {
+    let email = '';
     
-    // Cuando crees la página, descomenta esta línea:
-    // this.router.navigate(['/auth/forgot-password']);
+    switch (role) {
+      case 'admin':
+        email = 'admin@tienda.com';
+        break;
+      case 'seller':
+        email = 'seller@tienda.com';
+        break;
+      case 'buyer':
+        email = 'comprador@gmail.com';
+        break;
+    }
+
+    this.loginForm.patchValue({
+      username: email,
+      password: '123456'
+    });
+
+    console.log(`🚀 Auto-llenado como ${role}:`, email);
   }
 }
