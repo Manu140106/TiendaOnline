@@ -78,6 +78,16 @@ export class AdminDashboardComponent implements OnInit {
     this.router.navigate(['/products/create']);
   }
 
+  onManageUsers(): void {
+    console.log('👥 Navegando a Gestión de Usuarios');
+    this.router.navigate(['/admin/users']);
+  }
+
+  onViewReports(): void {
+    console.log('📊 Navegando a Reportes');
+    this.router.navigate(['/admin/reports']);
+  }
+
   logout(): void {
     this.authService.logout();
   }

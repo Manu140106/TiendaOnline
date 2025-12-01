@@ -1,0 +1,335 @@
+<div class="min-h-screen bg-gray-50">
+  <header class="bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-lg">
+    <div class="container mx-auto px-6 py-4">
+      <div class="flex justify-between items-center">
+        <div class="flex items-center gap-4">
+          <button 
+            (click)="goBack()"
+            class="text-white hover:text-purple-200 transition">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+            </svg>
+          </button>
+          <div class="text-3xl">👥</div>
+          <div>
+            <h1 class="text-2xl font-bold">Gestión de Usuarios</h1>
+            <p class="text-purple-200 text-sm">Administrar cuentas del sistema</p>
+          </div>
+        </div>
+        <button 
+          (click)="openCreateModal()"
+          class="px-6 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 transition font-semibold flex items-center gap-2">
+          <span class="text-xl">➕</span>
+          Nuevo Usuario
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container mx-auto px-6 py-8">
+
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+      <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-blue-500">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-gray-500 text-sm font-medium">Total Usuarios</p>
+            <p class="text-3xl font-bold text-gray-900">{{ stats.total }}</p>
+          </div>
+          <div class="text-4xl">👥</div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-red-500">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-gray-500 text-sm font-medium">Administradores</p>
+            <p class="text-3xl font-bold text-gray-900">{{ stats.admins }}</p>
+          </div>
+          <div class="text-4xl">👑</div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-blue-500">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-gray-500 text-sm font-medium">Vendedores</p>
+            <p class="text-3xl font-bold text-gray-900">{{ stats.sellers }}</p>
+          </div>
+          <div class="text-4xl">🏪</div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-green-500">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-gray-500 text-sm font-medium">Compradores</p>
+            <p class="text-3xl font-bold text-gray-900">{{ stats.buyers }}</p>
+          </div>
+          <div class="text-4xl">🛍️</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-xl shadow-md p-6 mb-6">
+      <div class="flex flex-wrap gap-4">
+        <input 
+          type="text"
+          [(ngModel)]="searchTerm"
+          (input)="applyFilters()"
+          placeholder="🔍 Buscar por nombre o email..."
+          class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+        
+        <select 
+          [(ngModel)]="filterRole"
+          (change)="applyFilters()"
+          class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+          <option value="">Todos los roles</option>
+          <option value="admin">👑 Administradores</option>
+          <option value="seller">🏪 Vendedores</option>
+          <option value="buyer">🛍️ Compradores</option>
+        </select>
+
+        <select 
+          [(ngModel)]="filterStatus"
+          (change)="applyFilters()"
+          class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+          <option value="">Todos los estados</option>
+          <option value="active">✓ Activos</option>
+          <option value="inactive">✗ Inactivos</option>
+        </select>
+
+        <button 
+          (click)="clearFilters()"
+          class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition">
+          Limpiar
+        </button>
+      </div>
+    </div>
+
+    <div *ngIf="isLoading" class="flex justify-center items-center py-12">
+      <mat-spinner diameter="50" class="mx-auto mb-4"></mat-spinner>
+      <p class="text-gray-600">Cargando usuarios...</p>
+    </div>
+
+    <div *ngIf="!isLoading" class="bg-white rounded-xl shadow-md overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full">
+          <thead class="bg-gradient-to-r from-purple-600 to-indigo-600 text-white">
+            <tr>
+              <th class="px-6 py-4 text-left text-sm font-semibold">Usuario</th>
+              <th class="px-6 py-4 text-left text-sm font-semibold">Email</th>
+              <th class="px-6 py-4 text-left text-sm font-semibold">Rol</th>
+              <th class="px-6 py-4 text-left text-sm font-semibold">Teléfono</th>
+              <th class="px-6 py-4 text-left text-sm font-semibold">Estado</th>
+              <th class="px-6 py-4 text-left text-sm font-semibold">Registro</th>
+              <th class="px-6 py-4 text-center text-sm font-semibold">Acciones</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-200">
+            <tr *ngFor="let user of filteredUsers" class="hover:bg-gray-50 transition">
+              <td class="px-6 py-4">
+                <div class="flex items-center gap-3">
+                  <img 
+                    [src]="user.avatar || 'https://via.placeholder.com/50'" 
+                    [alt]="user.name"
+                    class="w-12 h-12 rounded-full object-cover border-2 border-purple-200">
+                  <div>
+                    <p class="font-semibold text-gray-900">{{ user.name }}</p>
+                    <p class="text-xs text-gray-500">ID: {{ user.id }}</p>
+                  </div>
+                </div>
+              </td>
+              <td class="px-6 py-4">
+                <p class="text-sm text-gray-700">{{ user.email }}</p>
+              </td>
+              <td class="px-6 py-4">
+                <span class="px-3 py-1 rounded-full text-xs font-semibold"
+                      [class.bg-red-100]="user.role === 'admin'"
+                      [class.text-red-800]="user.role === 'admin'"
+                      [class.bg-blue-100]="user.role === 'seller'"
+                      [class.text-blue-800]="user.role === 'seller'"
+                      [class.bg-green-100]="user.role === 'buyer'"
+                      [class.text-green-800]="user.role === 'buyer'">
+                  {{ user.role === 'admin' ? '👑 Admin' : 
+                     user.role === 'seller' ? '🏪 Vendedor' : 
+                     '🛍️ Comprador' }}
+                </span>
+              </td>
+              <td class="px-6 py-4">
+                <p class="text-sm text-gray-600">{{ user.phone || 'N/A' }}</p>
+              </td>
+              <td class="px-6 py-4">
+                <button 
+                  (click)="toggleStatus(user)"
+                  [disabled]="user.id === currentUserId"
+                  class="px-3 py-1 rounded-full text-xs font-semibold transition"
+                  [class.bg-green-100]="user.isActive"
+                  [class.text-green-800]="user.isActive"
+                  [class.bg-red-100]="!user.isActive"
+                  [class.text-red-800]="!user.isActive"
+                  [class.opacity-50]="user.id === currentUserId"
+                  [class.cursor-not-allowed]="user.id === currentUserId">
+                  {{ user.isActive ? '✓ Activo' : '✗ Inactivo' }}
+                </button>
+              </td>
+              <td class="px-6 py-4">
+                <p class="text-xs text-gray-500">
+                  {{ user.createdAt | date:'dd/MM/yyyy' }}
+                </p>
+              </td>
+              <td class="px-6 py-4">
+                <div class="flex items-center justify-center gap-2">
+                  <button 
+                    (click)="openEditModal(user)"
+                    class="p-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition"
+                    title="Editar usuario">
+                    ✏️
+                  </button>
+                  <button 
+                    (click)="deleteUser(user)"
+                    [disabled]="user.id === currentUserId"
+                    class="p-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                    title="Eliminar usuario">
+                    🗑️
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div *ngIf="filteredUsers.length === 0" class="text-center py-12">
+        <div class="text-6xl mb-4">🔍</div>
+        <h3 class="text-xl font-bold text-gray-900 mb-2">No se encontraron usuarios</h3>
+        <p class="text-gray-600 mb-6">Intenta ajustar los filtros de búsqueda</p>
+        <button 
+          (click)="clearFilters()"
+          class="px-6 py-3 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition">
+          Limpiar Filtros
+        </button>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<div *ngIf="showModal" 
+     class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+     (click)="closeModal()">
+  <div (click)="$event.stopPropagation()" 
+       class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl p-8">
+    
+    <h2 class="text-2xl font-bold text-gray-900 mb-6">
+      {{ isEditMode ? '✏️ Editar Usuario' : '➕ Nuevo Usuario' }}
+    </h2>
+
+    <form [formGroup]="userForm" (ngSubmit)="onSubmit()" class="space-y-4">
+
+      <div class="grid md:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Nombre Completo *</label>
+          <input 
+            type="text"
+            formControlName="name"
+            placeholder="Juan Pérez"
+            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+          <p *ngIf="userForm.get('name')?.invalid && userForm.get('name')?.touched" 
+             class="text-red-500 text-xs mt-1">
+            El nombre debe tener al menos 3 caracteres
+          </p>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Email *</label>
+          <input 
+            type="email"
+            formControlName="email"
+            placeholder="usuario@email.com"
+            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+          <p *ngIf="userForm.get('email')?.invalid && userForm.get('email')?.touched" 
+             class="text-red-500 text-xs mt-1">
+            Email inválido
+          </p>
+        </div>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Rol *</label>
+          <select 
+            formControlName="role"
+            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+            <option value="">Seleccionar rol</option>
+            <option value="admin">👑 Administrador</option>
+            <option value="seller">🏪 Vendedor</option>
+            <option value="buyer">🛍️ Comprador</option>
+          </select>
+          <p *ngIf="userForm.get('role')?.invalid && userForm.get('role')?.touched" 
+             class="text-red-500 text-xs mt-1">
+            Debes seleccionar un rol
+          </p>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Teléfono</label>
+          <input 
+            type="tel"
+            formControlName="phone"
+            placeholder="+57 300 123 4567"
+            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+        </div>
+      </div>
+
+      <div *ngIf="!isEditMode">
+        <label class="block text-sm font-medium text-gray-700 mb-2">Contraseña *</label>
+        <input 
+          type="password"
+          formControlName="password"
+          placeholder="Mínimo 6 caracteres"
+          class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+        <p *ngIf="userForm.get('password')?.invalid && userForm.get('password')?.touched" 
+           class="text-red-500 text-xs mt-1">
+          La contraseña debe tener al menos 6 caracteres
+        </p>
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">Dirección</label>
+        <textarea 
+          formControlName="address"
+          rows="2"
+          placeholder="Dirección completa..."
+          class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none">
+        </textarea>
+      </div>
+
+      <div *ngIf="isEditMode" class="flex items-center gap-3">
+        <input 
+          type="checkbox"
+          formControlName="isActive"
+          id="isActive"
+          class="w-5 h-5 text-purple-600 border-gray-300 rounded focus:ring-purple-500">
+        <label for="isActive" class="text-sm font-medium text-gray-700">
+          Usuario activo
+        </label>
+      </div>
+
+      <div class="flex gap-3 pt-4">
+        <button 
+          type="submit"
+          [disabled]="userForm.invalid || isLoading"
+          class="flex-1 bg-purple-500 text-white py-3 px-6 rounded-lg hover:bg-purple-600 transition font-semibold disabled:bg-gray-300 disabled:cursor-not-allowed">
+          {{ isEditMode ? 'Actualizar Usuario' : 'Crear Usuario' }}
+        </button>
+        <button 
+          type="button"
+          (click)="closeModal()"
+          class="flex-1 bg-gray-200 text-gray-700 py-3 px-6 rounded-lg hover:bg-gray-300 transition font-semibold">
+          Cancelar
+        </button>
+      </div>
+    </form>
+
+  </div>
+</div>
